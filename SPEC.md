@@ -18,7 +18,9 @@ Each puzzle has exactly one solution.
 - Tap a cell, then tap a digit in the options panel (below the board on phones, beside it on desktop).
 - Digits already in the cell's square, row or column are crossed out.
 - A wrong digit is crossed out for that cell and adds a mistake.
-- Hold (mobile) or right-click (desktop) a digit to mark it as possible; marks show small in the cell.
+- Hold (mobile) or right-click (desktop) a digit to mark it as possible; marks show small in the cell. Placing a digit clears it from marks in the same row, column and square.
+- Mistakes are unlimited; a solve with no mistakes earns a Flawless distinction.
+- The timer pauses while the window is hidden or unfocused.
 - The line under the board breaks the hovered or selected digit into bits, e.g. 1+2+8=B.
 - No level list: pick Easy (singles only), Medium (needs shared-bit deduction) or Hard (needs pairs and pointing) for a new puzzle. Timer and mistake count are shown; win screen at the end.
 

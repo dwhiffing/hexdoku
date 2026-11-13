@@ -180,8 +180,16 @@ function place(d: number) {
   if (state.puzzle.solution[i] === d) {
     state.grid[i] = d;
     state.marks[i] = 0;
-    if (state.grid.every((v, k) => v === state.puzzle.solution[k])) win();
-    else buzz('place');
+    // The digit can no longer go anywhere else in this row, column or square.
+    for (let j = 0; j < CELLS; j++)
+      if (rowOf(j) === rowOf(i) || colOf(j) === colOf(i) || boxOf(j) === boxOf(i)) state.marks[j] &= ~(1 << d);
+    if (state.grid.every((v, k) => v === state.puzzle.solution[k])) {
+      save();
+      render();
+      win(i);
+      return;
+    }
+    buzz('place');
   } else {
     state.wrong[i] |= 1 << d;
     state.marks[i] &= ~(1 << d);
@@ -291,8 +299,12 @@ function fmtTime(ms: number) {
   return (h ? `${h}:` : '') + `${mm}:${ss}`;
 }
 
+const isPaused = () => document.hidden || !document.hasFocus();
+
 function renderTimer() {
-  timerEl.innerHTML = `<span class="lbl">${state.puzzle.difficulty}</span>${fmtTime(state.elapsed)}`;
+  const paused = isPaused() && !state.won;
+  timerEl.classList.toggle('paused', paused);
+  timerEl.innerHTML = `<span class="lbl">${paused ? 'paused' : state.puzzle.difficulty}</span>${fmtTime(state.elapsed)}`;
 }
 
 // ---- Timer ---------------------------------------------------------------
@@ -301,7 +313,7 @@ setInterval(() => {
   const now = performance.now();
   const dt = now - last;
   last = now;
-  if (state.won || document.hidden || !overlay.hidden) return;
+  if (state.won || isPaused() || !overlay.hidden) return;
   const before = Math.floor(state.elapsed / 1000);
   state.elapsed += Math.min(dt, 1000);
   if (Math.floor(state.elapsed / 1000) !== before) {
@@ -309,7 +321,11 @@ setInterval(() => {
     save();
   }
 }, 250);
-document.addEventListener('visibilitychange', () => { last = performance.now(); });
+// Pause while the window is hidden or not focused.
+const onFocusChange = () => { last = performance.now(); renderTimer(); };
+document.addEventListener('visibilitychange', onFocusChange);
+window.addEventListener('blur', onFocusChange);
+window.addEventListener('focus', onFocusChange);
 
 // ---- Sheets (new game / win) ----------------------------------------------
 function showSheet(id: 'newSheet' | 'statsSheet') {
@@ -317,7 +333,9 @@ function showSheet(id: 'newSheet' | 'statsSheet') {
   $('statsSheet').hidden = id !== 'statsSheet';
   overlay.hidden = false;
 }
-function openSheet(title: string, body: string, cancellable: boolean) {
+function openSheet(title: string, body: string, cancellable: boolean, badge = false) {
+  $('badge').hidden = !badge;
+  $('newSheet').querySelector<HTMLElement>('.help')!.hidden = !cancellable;
   $('sheetTitle').textContent = title;
   $('sheetBody').textContent = body;
   $('closeSheet').hidden = !cancellable;
@@ -332,10 +350,26 @@ function closeSheet() {
 
 let winText = '';
 function openWin() {
-  openSheet('Solved!', winText, false);
+  openSheet('Solved!', winText, false, state.mistakes === 0);
 }
 
-function win() {
+/** Ripple the board out from the last placed cell, then show the win sheet. */
+function winAnimation(origin: number, done: () => void) {
+  let maxDelay = 0;
+  for (let i = 0; i < CELLS; i++) {
+    const dist = Math.max(Math.abs(rowOf(i) - rowOf(origin)), Math.abs(colOf(i) - colOf(origin)));
+    const delay = dist * 70;
+    maxDelay = Math.max(maxDelay, delay);
+    cellEls[i].style.setProperty('--delay', `${delay}ms`);
+    cellEls[i].classList.add('win');
+  }
+  setTimeout(() => {
+    cellEls.forEach((el) => el.classList.remove('win'));
+    done();
+  }, maxDelay + 600);
+}
+
+function win(origin: number) {
   state.won = true;
   state.selected = -1;
   const p = state.puzzle;
@@ -346,7 +380,8 @@ function win() {
   winText = `${fmtTime(state.elapsed)} with ${m} mistake${m === 1 ? '' : 's'}.` +
     (best && prev !== null ? ' New best time!' : '') + ' Play again?';
   buzz('win');
-  openWin();
+  render();
+  winAnimation(origin, openWin);
 }
 
 // ---- Stats sheet ---------------------------------------------------------
@@ -364,7 +399,7 @@ function renderStats() {
     ['Solved', String(s.solved)],
     ['Best', t(s.best)],
     ['Average', t(s.average)],
-    ['Perfect', String(s.perfect)],
+    ['Flawless', String(s.perfect)],
     ['Avg miss', s.avgMistakes === null ? '--' : s.avgMistakes.toFixed(1)],
     ['Streak', String(s.streak)],
   ];
@@ -373,7 +408,8 @@ function renderStats() {
   $('recent').innerHTML = recent.length
     ? recent.map((g) => {
         const d = new Date(g.at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-        return `<li><span>${d}</span><span>${fmtTime(g.ms)}</span><span>${g.mistakes} miss</span></li>`;
+        const miss = g.mistakes ? `${g.mistakes} miss` : '<b>flawless</b>';
+        return `<li><span>${d}</span><span>${fmtTime(g.ms)}</span><span>${miss}</span></li>`;
       }).join('')
     : '<li class="empty">No solves yet</li>';
   $('hapticsBtn').textContent = `Haptics: ${hapticsEnabled() ? 'On' : 'Off'}`;
@@ -448,7 +484,8 @@ $('themeBtn').textContent = PALETTES[themeIndex].name;
 
 render();
 if (state.won) {
-  winText = `${fmtTime(state.elapsed)} with ${state.mistakes} mistakes. Play again?`;
+  const m = state.mistakes;
+  winText = `${fmtTime(state.elapsed)} with ${m} mistake${m === 1 ? '' : 's'}. Play again?`;
   openWin();
 }
 
