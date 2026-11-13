@@ -17,11 +17,13 @@ npm run preview  # serve the build (the service worker only runs in builds)
 It's a PWA. Open the built site over HTTPS (or localhost), then use "Add to Home Screen"
 (iOS Safari share menu) or "Install app" (Android Chrome). It works offline after the first load.
 A plain `http://192.168.x.x` LAN address won't install, because browsers require HTTPS for
-service workers, so GitHub Pages is the easy way to install it on a phone.
+service workers, so use the GitHub Pages build: https://dwhiffing.github.io/hexdoku/
 
 ## Where things live
 
-- `src/engine.ts`: rules, solver and puzzle generator (seeded, unique solutions)
+- `src/engine.ts`: rules and backtracking solver
+- `src/logic.ts`: human-style solver that rates puzzles by technique (singles, bit deduction, subsets)
+- `src/generate.ts`: seeded generator; difficulty = hardest technique needed (runs in `src/worker.ts`)
 - `src/main.ts`: game state, input and rendering. `CONFIG.bitCrossOut` turns on shared-bit cross-out.
 - `src/stats.ts`: solve history and per-difficulty summaries (localStorage)
 - `src/haptics.ts`: vibration patterns (Android only; iOS Safari has no vibration API)

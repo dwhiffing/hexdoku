@@ -20,7 +20,7 @@ Each puzzle has exactly one solution.
 - A wrong digit is crossed out for that cell and adds a mistake.
 - Hold (mobile) or right-click (desktop) a digit to mark it as possible; marks show small in the cell.
 - The line under the board breaks the hovered or selected digit into bits, e.g. 1+2+8=B.
-- No level list: pick Easy, Medium or Hard for a new puzzle. Timer and mistake count are shown; win screen at the end.
+- No level list: pick Easy (singles only), Medium (needs shared-bit deduction) or Hard (needs pairs and pointing) for a new puzzle. Timer and mistake count are shown; win screen at the end.
 
 ## Open questions
 

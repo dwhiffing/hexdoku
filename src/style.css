@@ -170,6 +170,9 @@ h1 { margin: 0; font-size: 18px; font-weight: 400; letter-spacing: 2px; color: v
 .sheet h2 { margin: 0; font-size: 20px; font-weight: 400; color: var(--accent); }
 .sheet p { margin: 0; font-size: 12px; color: var(--ink); line-height: 1.5; }
 .diffs { display: flex; flex-direction: column; gap: 8px; }
+.diffs button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 6px 16px; }
+.diffs small { font-size: 9px; color: var(--dim); text-transform: none; }
+.diffs button:disabled { opacity: 0.5; }
 .bar button { min-height: 34px; font-size: 12px; }
 .sheet .help { color: var(--dim); font-size: 10px; }
 .sheet[hidden] { display: none; }

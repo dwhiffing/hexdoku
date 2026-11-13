@@ -146,7 +146,6 @@ export function solve(
 }
 
 export type Difficulty = 'easy' | 'medium' | 'hard';
-const TARGET_GIVENS: Record<Difficulty, number> = { easy: 34, medium: 26, hard: 0 };
 
 export interface Puzzle {
   seed: number;
@@ -155,7 +154,8 @@ export interface Puzzle {
   solution: Grid;
 }
 
-function fullGrid(rng: Rng): Grid {
+/** A random complete, valid grid. */
+export function fullGrid(rng: Rng): Grid {
   for (;;) {
     const out: Grid = new Array(CELLS).fill(EMPTY);
     const n = solve(new Array(CELLS).fill(EMPTY), 1, out, rng, { nodes: 50000 });
@@ -163,21 +163,8 @@ function fullGrid(rng: Rng): Grid {
   }
 }
 
-/** Generate a puzzle with a unique solution. */
-export function generate(seed: number, difficulty: Difficulty): Puzzle {
-  const rng = makeRng(seed);
-  const solution = fullGrid(rng);
-  const givens = solution.slice();
-  const target = TARGET_GIVENS[difficulty];
-  let count = CELLS;
-  for (const i of shuffled(range(CELLS), rng)) {
-    if (count <= target) break;
-    const keep = givens[i];
-    givens[i] = EMPTY;
-    if (solve(givens, 2, undefined, undefined, { nodes: 20000 }) !== 1) givens[i] = keep;
-    else count--;
-  }
-  return { seed, difficulty, givens, solution };
+export function shuffle(arr: number[], rng: Rng): number[] {
+  return shuffled(arr, rng);
 }
 
 /** The bits that make up a digit, e.g. 11 -> [1, 2, 8]. */

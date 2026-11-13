@@ -1,6 +1,7 @@
 import '@fontsource/silkscreen/400.css';
 import './style.css';
-import { CELLS, EMPTY, SIZE, Difficulty, Grid, Puzzle, generate, usedMask, bitBlockedMask, rowOf, colOf, boxOf, hex } from './engine';
+import { CELLS, EMPTY, SIZE, Difficulty, Grid, Puzzle, usedMask, bitBlockedMask, rowOf, colOf, boxOf, hex } from './engine';
+import { generate, TECHNIQUES } from './generate';
 import { glyph } from './font';
 import { PALETTES, applyPalette } from './palettes';
 import { buzz, hapticsEnabled, hapticsSupported, setHaptics } from './haptics';
@@ -37,8 +38,13 @@ const store = {
   },
 };
 
+const randomSeed = () => (Math.random() * 2 ** 32) >>> 0;
+
 function newState(difficulty: Difficulty): State {
-  const puzzle = generate((Math.random() * 2 ** 32) >>> 0, difficulty);
+  return stateFor(generate(randomSeed(), difficulty));
+}
+
+function stateFor(puzzle: Puzzle): State {
   return {
     puzzle,
     grid: puzzle.givens.slice(),
@@ -395,15 +401,43 @@ $('closeStats').addEventListener('click', closeSheet);
 $('newBtn').addEventListener('click', () => openSheet('New puzzle', 'Pick a difficulty.', true));
 $('closeSheet').addEventListener('click', closeSheet);
 overlay.addEventListener('click', (e) => { if (e.target === overlay) closeSheet(); });
-overlay.querySelectorAll<HTMLButtonElement>('[data-diff]').forEach((b) =>
-  b.addEventListener('click', () => {
-    state = newState(b.dataset.diff as Difficulty);
+// Generate in a worker when possible; fall back to the main thread.
+let worker: Worker | null = null;
+try {
+  worker = new Worker(new URL('./worker.ts', import.meta.url), { type: 'module' });
+} catch {
+  worker = null;
+}
+function requestPuzzle(difficulty: Difficulty): Promise<Puzzle> {
+  const seed = randomSeed();
+  if (!worker) return Promise.resolve(generate(seed, difficulty));
+  return new Promise((resolve) => {
+    worker!.onmessage = (e: MessageEvent<Puzzle>) => resolve(e.data);
+    worker!.onerror = () => resolve(generate(seed, difficulty));
+    worker!.postMessage({ seed, difficulty });
+  });
+}
+
+let generating = false;
+const diffButtons = overlay.querySelectorAll<HTMLButtonElement>('[data-diff]');
+diffButtons.forEach((b) => {
+  const d = b.dataset.diff as Difficulty;
+  b.innerHTML = `${d}<small>${TECHNIQUES[d]}</small>`;
+  b.addEventListener('click', async () => {
+    if (generating) return;
+    generating = true;
+    diffButtons.forEach((x) => (x.disabled = true));
+    $('sheetBody').textContent = 'Generating…';
+    const puzzle = await requestPuzzle(d);
+    generating = false;
+    diffButtons.forEach((x) => (x.disabled = false));
+    state = stateFor(puzzle);
     save();
     overlay.hidden = true;
     last = performance.now();
     render();
-  }),
-);
+  });
+});
 $('themeBtn').addEventListener('click', () => {
   themeIndex = (themeIndex + 1) % PALETTES.length;
   applyPalette(PALETTES[themeIndex]);
