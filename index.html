@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <meta name="theme-color" content="#14201b" />
+    <meta name="description" content="A hex-digit logic puzzle." />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Hexdoku" />
+    <title>Hexdoku</title>
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" type="image/png" href="./favicon.png" />
+    <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+  </head>
+  <body>
+    <main id="app">
+      <header class="top">
+        <div class="stat" id="timer" aria-label="Time"></div>
+        <h1>Hexdoku</h1>
+        <div class="stat" id="mistakes" aria-label="Mistakes"></div>
+      </header>
+      <nav class="bar">
+        <button id="newBtn">New</button>
+        <button id="statsBtn">Stats</button>
+        <button id="themeBtn">Theme</button>
+      </nav>
+      <section class="play">
+        <div class="frame"><div class="board" id="board"></div></div>
+        <div class="side">
+          <div class="bits" id="bits" aria-live="polite"></div>
+          <div class="options" id="options"></div>
+          <div class="hint">Tap to place. Hold (or right-click) to mark possible.</div>
+        </div>
+      </section>
+    </main>
+    <div class="overlay" id="overlay" hidden>
+      <div class="sheet" id="newSheet">
+        <h2 id="sheetTitle">New puzzle</h2>
+        <p id="sheetBody"></p>
+        <p class="help">Tap a cell, then tap a digit to place it. Hold a digit to mark it as possible.</p>
+        <div class="diffs">
+          <button data-diff="easy">Easy</button>
+          <button data-diff="medium">Medium</button>
+          <button data-diff="hard">Hard</button>
+        </div>
+        <button class="ghost" id="closeSheet">Cancel</button>
+      </div>
+      <div class="sheet" id="statsSheet" hidden>
+        <h2>Stats</h2>
+        <div class="tabs" id="statTabs">
+          <button data-tab="easy">Easy</button>
+          <button data-tab="medium">Medium</button>
+          <button data-tab="hard">Hard</button>
+        </div>
+        <div class="tiles" id="statTiles"></div>
+        <h3>Recent</h3>
+        <ol class="recent" id="recent"></ol>
+        <button id="hapticsBtn">Haptics</button>
+        <p class="help" id="hapticsNote"></p>
+        <button class="ghost" id="clearStats">Clear history</button>
+        <button class="ghost" id="closeStats">Close</button>
+      </div>
+    </div>
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>

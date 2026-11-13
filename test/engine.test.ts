@@ -1,0 +1,29 @@
+import { describe, it, expect } from 'vitest';
+import { generate, solve, ROWS, COLS, BOXES, ROW_SEG, COL_SEG, EMPTY } from '../src/engine';
+
+function valid(g: number[]) {
+  for (const set of [...ROWS, ...COLS, ...BOXES]) {
+    const v = set.map((i) => g[i]);
+    if (new Set(v).size !== v.length) return false;
+  }
+  for (let i = 0; i < 64; i++) for (const seg of [ROW_SEG[i], COL_SEG[i]]) {
+    let a = 0xf; for (const j of seg) if (g[j] > 0) a &= g[j];
+    if (!a) return false;
+  }
+  return true;
+}
+
+describe('generator', () => {
+  for (const d of ['easy', 'medium', 'hard'] as const) {
+    it(`makes a unique ${d} puzzle`, () => {
+      for (let seed = 1; seed <= 5; seed++) {
+        const t = Date.now();
+        const p = generate(seed, d);
+        expect(valid(p.solution)).toBe(true);
+        expect(solve(p.givens, 2)).toBe(1);
+        const n = p.givens.filter((x) => x !== EMPTY).length;
+        console.log(d, seed, 'givens', n, Date.now() - t, 'ms');
+      }
+    });
+  }
+});
