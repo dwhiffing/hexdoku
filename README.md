@@ -27,6 +27,7 @@ service workers, so use the GitHub Pages build: https://dwhiffing.github.io/hexd
 - `src/main.ts`: game state, input and rendering. `CONFIG.bitCrossOut` turns on shared-bit cross-out.
 - `src/stats.ts`: solve history and per-difficulty summaries (localStorage)
 - `src/haptics.ts`: vibration patterns (Android only; iOS Safari has no vibration API)
+- `src/tutorial.ts`: tutorial steps and the in-game rules reference
 - `src/palettes.ts`: all colors. Add an object to `PALETTES` to add a theme.
 - `src/font.ts`: the 5x7 pixel font for digits
 - `public/sw.js`, `public/manifest.webmanifest`: offline support and install metadata

@@ -12,6 +12,8 @@ Features left out so far, roughly in priority order.
 
 ## Done
 
+- [x] Tutorial (7 illustrated steps, shown on first launch, replayable) and a Rules sheet available during play
+
 - [x] Placing a digit clears it from possible marks in its row, column and square
 - [x] Flawless distinction for solves with no mistakes; win ripple animation
 - [x] Timer pauses when the window is hidden or loses focus

@@ -24,6 +24,7 @@
       <nav class="bar">
         <button id="newBtn">New</button>
         <button id="statsBtn">Stats</button>
+        <button id="rulesBtn">Rules</button>
         <button id="themeBtn">Theme</button>
       </nav>
       <section class="play">
@@ -47,6 +48,23 @@
           <button data-diff="hard">Hard</button>
         </div>
         <button class="ghost" id="closeSheet">Cancel</button>
+      </div>
+      <div class="sheet" id="tutorialSheet" hidden>
+        <p class="lbl" id="tutStep"></p>
+        <h2 id="tutTitle"></h2>
+        <div class="art" id="tutArt"></div>
+        <p id="tutBody"></p>
+        <div class="pair">
+          <button id="tutBack">Back</button>
+          <button id="tutNext">Next</button>
+        </div>
+        <button class="ghost" id="tutSkip">Skip</button>
+      </div>
+      <div class="sheet" id="rulesSheet" hidden>
+        <h2>Rules</h2>
+        <div id="rulesBody"></div>
+        <button id="tutReplay">Replay tutorial</button>
+        <button class="ghost" id="closeRules">Close</button>
       </div>
       <div class="sheet" id="statsSheet" hidden>
         <h2>Stats</h2>

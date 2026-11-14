@@ -160,6 +160,7 @@ h1 { margin: 0; font-size: 18px; font-weight: 400; letter-spacing: 2px; color: v
   position: fixed;
   inset: 0;
   overflow-y: auto;
+  align-content: safe center;
   background: color-mix(in srgb, var(--bg) 80%, transparent);
   display: grid;
   place-items: center;
@@ -182,9 +183,42 @@ h1 { margin: 0; font-size: 18px; font-weight: 400; letter-spacing: 2px; color: v
 .diffs button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 6px 16px; }
 .diffs small { font-size: 9px; color: var(--dim); text-transform: none; }
 .diffs button:disabled { opacity: 0.5; }
-.bar button { min-height: 34px; font-size: 12px; }
+.bar button { min-height: 34px; font-size: 11px; padding: 0 10px; flex: 1; }
 .sheet .help { color: var(--dim); font-size: 10px; }
 .sheet[hidden] { display: none; }
+.sheet button:disabled { opacity: 0.35; }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.sheet p#tutBody { text-align: left; }
+#tutorialSheet { min-height: min(470px, calc(100svh - 32px)); }
+#tutorialSheet .art { min-height: 150px; justify-content: center; }
+.art { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 8px 0; }
+.mini { display: flex; gap: 3px; justify-content: center; }
+.mini-cell { width: 30px; height: 30px; background: var(--panel); color: var(--ink); display: grid; place-items: center; }
+.mini-cell .g { width: 36%; height: auto; aspect-ratio: 5 / 7; }
+.mini-cell.hi { color: var(--accent); }
+.mini-cell.bad { background: var(--bad); color: var(--bg); }
+.mini-cell.dim { color: var(--dim); }
+.mini-cell.q { box-shadow: inset 0 0 0 2px var(--mark); }
+.mini-q { color: var(--mark); font-size: 14px; }
+.mini-gap { width: 8px; }
+.bitrow { gap: 3px; }
+.mini-bits { width: 30px; font-size: 9px; text-align: center; line-height: 1.25; display: flex; flex-direction: column; }
+.mini-bits b { font-weight: 400; color: var(--dim); opacity: 0.25; }
+.mini-bits b.has { color: var(--ink); opacity: 1; }
+.mini-bits b.on { color: var(--accent); opacity: 1; }
+.mini-square { display: grid; grid-template-columns: repeat(4, 30px); gap: 3px; }
+.mini-board { display: grid; grid-template-columns: repeat(2, auto); gap: 6px; }
+.mini-box { display: grid; grid-template-columns: repeat(4, 14px); grid-auto-rows: 14px; gap: 2px; }
+.mini-box span { background: var(--panel); }
+.bitline { gap: 2px; color: var(--dim); }
+.bitline span { width: 15px; height: 21px; }
+.bitline span.on { color: var(--accent); }
+.rules { text-align: left; margin: 0; padding-left: 20px; font-size: 11px; line-height: 1.6; display: flex; flex-direction: column; gap: 6px; }
+.bits-table { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; align-self: center; }
+.bits-table > div { display: flex; align-items: center; gap: 8px; }
+.bits-table .lbl { width: 44px; text-align: left; }
+.bits-table .ex { display: flex; gap: 2px; color: var(--ink); }
+.bits-table .ex .g { width: 9px; height: 13px; }
 .badge {
   align-self: center;
   margin: 0;

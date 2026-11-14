@@ -20,7 +20,8 @@ Each puzzle has exactly one solution.
 - A wrong digit is crossed out for that cell and adds a mistake.
 - Hold (mobile) or right-click (desktop) a digit to mark it as possible; marks show small in the cell. Placing a digit clears it from marks in the same row, column and square.
 - Mistakes are unlimited; a solve with no mistakes earns a Flawless distinction.
-- The timer pauses while the window is hidden or unfocused.
+- The timer pauses while the window is hidden or unfocused, and while any sheet (rules, stats, tutorial) is open.
+- A 7-step illustrated tutorial runs on first launch; the Rules button shows the rules and a bit table during play, with a link to replay the tutorial.
 - The line under the board breaks the hovered or selected digit into bits, e.g. 1+2+8=B.
 - No level list: pick Easy (singles only), Medium (needs shared-bit deduction) or Hard (needs pairs and pointing) for a new puzzle. Timer and mistake count are shown; win screen at the end.
 

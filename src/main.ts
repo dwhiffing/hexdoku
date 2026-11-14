@@ -3,6 +3,7 @@ import './style.css';
 import { CELLS, EMPTY, SIZE, Difficulty, Grid, Puzzle, usedMask, bitBlockedMask, rowOf, colOf, boxOf, hex } from './engine';
 import { generate, TECHNIQUES } from './generate';
 import { glyph } from './font';
+import { STEPS, rulesHtml } from './tutorial';
 import { PALETTES, applyPalette } from './palettes';
 import { buzz, hapticsEnabled, hapticsSupported, setHaptics } from './haptics';
 import { record, loadHistory, summarize, clearHistory } from './stats';
@@ -328,10 +329,12 @@ window.addEventListener('blur', onFocusChange);
 window.addEventListener('focus', onFocusChange);
 
 // ---- Sheets (new game / win) ----------------------------------------------
-function showSheet(id: 'newSheet' | 'statsSheet') {
-  $('newSheet').hidden = id !== 'newSheet';
-  $('statsSheet').hidden = id !== 'statsSheet';
+type SheetId = 'newSheet' | 'statsSheet' | 'rulesSheet' | 'tutorialSheet';
+const SHEETS: SheetId[] = ['newSheet', 'statsSheet', 'rulesSheet', 'tutorialSheet'];
+function showSheet(id: SheetId) {
+  for (const s of SHEETS) $(s).hidden = s !== id;
   overlay.hidden = false;
+  overlay.scrollTop = 0;
 }
 function openSheet(title: string, body: string, cancellable: boolean, badge = false) {
   $('badge').hidden = !badge;
@@ -342,6 +345,7 @@ function openSheet(title: string, body: string, cancellable: boolean, badge = fa
   showSheet('newSheet');
 }
 function closeSheet() {
+  if (!$('tutorialSheet').hidden) { finishTutorial(); return; }
   if (state.won && !$('newSheet').hidden) return;
   if (state.won) { openWin(); return; }
   overlay.hidden = true;
@@ -383,6 +387,42 @@ function win(origin: number) {
   render();
   winAnimation(origin, openWin);
 }
+
+// ---- Tutorial and rules --------------------------------------------------
+const TUTORIAL_KEY = 'hexdoku:tutorial';
+let tutStep = 0;
+
+function renderTutorial() {
+  const step = STEPS[tutStep];
+  $('tutStep').textContent = `${tutStep + 1} / ${STEPS.length}`;
+  $('tutTitle').textContent = step.title;
+  $('tutArt').innerHTML = step.art;
+  $('tutBody').textContent = step.body;
+  ($('tutBack') as HTMLButtonElement).disabled = tutStep === 0;
+  $('tutNext').textContent = tutStep === STEPS.length - 1 ? 'Play' : 'Next';
+}
+function openTutorial() {
+  tutStep = 0;
+  renderTutorial();
+  showSheet('tutorialSheet');
+}
+function finishTutorial() {
+  store.set(TUTORIAL_KEY, 'done');
+  $('tutorialSheet').hidden = true;
+  overlay.hidden = true;
+  last = performance.now();
+  if (state.won) openWin();
+}
+$('tutNext').addEventListener('click', () => {
+  if (tutStep < STEPS.length - 1) { tutStep++; renderTutorial(); } else finishTutorial();
+});
+$('tutBack').addEventListener('click', () => { if (tutStep > 0) { tutStep--; renderTutorial(); } });
+$('tutSkip').addEventListener('click', finishTutorial);
+
+$('rulesBody').innerHTML = rulesHtml();
+$('rulesBtn').addEventListener('click', () => showSheet('rulesSheet'));
+$('closeRules').addEventListener('click', closeSheet);
+$('tutReplay').addEventListener('click', openTutorial);
 
 // ---- Stats sheet ---------------------------------------------------------
 let statTab: Difficulty = 'medium';
@@ -483,7 +523,8 @@ $('themeBtn').addEventListener('click', () => {
 $('themeBtn').textContent = PALETTES[themeIndex].name;
 
 render();
-if (state.won) {
+if (!store.get(TUTORIAL_KEY)) openTutorial();
+else if (state.won) {
   const m = state.mistakes;
   winText = `${fmtTime(state.elapsed)} with ${m} mistake${m === 1 ? '' : 's'}. Play again?`;
   openWin();
